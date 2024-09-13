@@ -1,0 +1,54 @@
+const axios = require('axios');
+
+async function getUPSTrackingInfo(trackingNumber) {
+  // UPS API credentials
+  const clientId = 'YOUR_CLIENT_ID';
+  const clientSecret = 'YOUR_CLIENT_SECRET';
+
+  // UPS API endpoints
+  const authUrl = 'https://onlinetools.ups.com/security/v1/oauth/token';
+  const trackingUrl = 'https://onlinetools.ups.com/api/track/v1/details';
+
+  try {
+    // Step 1: Authenticate and get access token
+    const authResponse = await axios.post(authUrl, 
+      'grant_type=client_credentials',
+      {
+        auth: {
+          username: clientId,
+          password: clientSecret
+        },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'x-merchant-id': 'YOUR_MERCHANT_ID'
+        }
+      }
+    );
+
+    const accessToken = authResponse.data.access_token;
+
+    // Step 2: Make the tracking request
+    const trackingResponse = await axios.get(`${trackingUrl}/${trackingNumber}`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'transId': 'string',
+        'transactionSrc': 'testing'
+      }
+    });
+
+    // Return the tracking data
+    return trackingResponse.data;
+
+  } catch (error) {
+    console.error('Error fetching tracking info:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
+
+// Example usage
+// getUPSTrackingInfo('1Z999AA1123456784')
+//   .then(data => console.log(JSON.stringify(data, null, 2)))
+//   .catch(error => console.error('Error:', error));
+
+module.exports = getUPSTrackingInfo;
