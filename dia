@@ -1,0 +1,24 @@
+graph TB
+    A[System A] -->|Connects to| B_DB[(System B Database)]
+    B[System B] -->|Has| B_DB
+    B -->|Has| CRON[Cron Job]
+    CRON -->|Pulls from| B_DB
+    CRON -->|Sends tracking info| C[System C]
+    C -->|Has| AD[Adapters]
+    AD -->|Connects to| FEDEX[FedEx]
+    AD -->|Connects to| UPS[UPS]
+    FEDEX -->|Sends tracking info| AD
+    UPS -->|Sends tracking info| AD
+    AD -->|Returns tracking info| C
+    C -->|Sends tracking status| CRON
+    CRON -->|Updates| B_DB
+
+    classDef system fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef database fill:#bbb,stroke:#333,stroke-width:2px;
+    classDef process fill:#bbf,stroke:#333,stroke-width:2px;
+    classDef external fill:#bfb,stroke:#333,stroke-width:2px;
+
+    class A,B,C system;
+    class B_DB database;
+    class CRON,AD process;
+    class FEDEX,UPS external;
